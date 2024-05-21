@@ -1,0 +1,159 @@
+.app {
+  position: relative;
+  width: 100vw;
+  max-width: initial !important;
+
+  // background: linear-gradient(62deg, #8ec5fc 0%, #e0c3fc 100%);
+
+  .content {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 100dvh;
+    padding: 12px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+
+    footer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      height: 130px;
+    }
+  }
+}
+
+.numberInput {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 8px;
+
+  > * {
+    display: block;
+    outline: none;
+    border: none;
+  }
+
+  label {
+    margin-left: 2px;
+    font-size: inherit;
+    font-family: inherit;
+  }
+
+  input {
+    font-size: inherit;
+    font-family: inherit;
+    background: #ebebeb;
+    border-radius: 8px;
+    padding: 4px 8px;
+    width: 100%;
+  }
+}
+
+.card {
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+  }
+}
+
+.communityCardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .communityCards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    > * {
+      display: inline-block;
+    }
+  }
+}
+
+.pocketCards {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  width: fit-content;
+  gap: 4px;
+  height: 100%;
+}
+
+.settingsCard {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  width: 100%;
+  // max-width: 550px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  padding: 18px 20px;
+
+  .inputs {
+    flex-basis: 100%;
+  }
+
+  .bigButtons {
+    flex-basis: 0%;
+    display: flex;
+    flex-direction: column;
+    gap: inherit;
+  }
+}
+
+.progressButton {
+  position: relative;
+  border: none;
+  outline: none;
+  background: none;
+  transition: all 0.2s ease;
+  border-radius: 5px;
+  background: linear-gradient(62deg, #8ec5fc 0%, #e0c3fc 100%);
+
+  padding: 12px 36px;
+  font-size: 24px;
+  color: #fff;
+
+  cursor: pointer;
+
+  > span {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 0px;
+    backdrop-filter: brightness(0.5);
+    transition: all 0.2s ease;
+    border-radius: inherit;
+  }
+}
+
+@media (hover: hover) {
+  .card {
+    &:hover {
+      transform: scale(1.025);
+    }
+  }
+
+  .simulateButton {
+    &:hover {
+      transform: scale(1.025);
+    }
+  }
+}

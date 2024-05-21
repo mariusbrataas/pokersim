@@ -1,0 +1,23 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/package-lock.json": true,
+    "**/out": true,
+    "**/next-env.d.ts": true,
+    "**/functions/lib": true,
+    "functions/src/routines/**/index.ts": true,
+    "functions/src/functions/**/index.ts": true,
+    "functions/src/utils/**/index.ts": true,
+    "types/**/index.ts": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "git.postCommitCommand": "sync"
+}
