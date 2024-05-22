@@ -184,16 +184,6 @@ function App() {
                 value={players}
                 onChange={setPlayers}
               />
-              <NumberInput
-                title="Pot size"
-                value={potSize}
-                onChange={setPotSize}
-              />
-              <NumberInput
-                title="Amount to call"
-                value={amountToCall}
-                onChange={setAmountToCall}
-              />
             </div>
             <div className={styles.bigButtons}>
               <button
