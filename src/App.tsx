@@ -225,6 +225,10 @@ function App() {
                 ></span>
               </button>
               <button
+                style={{
+                  backgroundColor: '#FFE53B',
+                  backgroundImage: `linear-gradient(45deg, #FFE53B 0%, #FF2525 74%)`
+                }}
                 className={styles.progressButton}
                 onClick={() => {
                   const deck = new Deck();
@@ -240,6 +244,7 @@ function App() {
                 Shuffle
               </button>
               <button
+                style={{ background: 'lightgray' }}
                 className={styles.progressButton}
                 onClick={() => setShowInfo(true)}
               >
