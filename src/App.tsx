@@ -122,7 +122,7 @@ function App() {
     worker.post('simulation', {
       myHand: filteredPocket,
       communityCards: filteredCommunity,
-      numPlayers: players,
+      numPlayers: Math.min(14, Math.max(2, players)),
       potSize,
       amountToCall,
       simulationIterations: simulations,
@@ -202,7 +202,7 @@ function App() {
                 title="Number of players"
                 value={players}
                 onChange={v => {
-                  setPlayers(Math.min(14, Math.max(2, Math.round(v))));
+                  setPlayers(Math.min(14, Math.max(0, Math.round(v))));
                 }}
               />
               <NumberInput
