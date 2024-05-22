@@ -277,7 +277,7 @@ function App() {
         <Modal onClose={() => setShowInfo(false)} className={styles.infoModal}>
           <h2>Info</h2>
           <p>
-            Welcome to our Poker Hand Strength Simulator! This tool is designed
+            Welcome to the Poker Hand Strength Simulator! This tool is designed
             to help you estimate the strength of a poker hand by running
             simulations.
           </p>
@@ -319,6 +319,11 @@ function App() {
               number of simulations.
             </li>
           </ol>
+          <p>
+            You can change the number of times the simulation is run. A higher
+            number of simulations yields a more accurate result, but takes a bit
+            longer to finish.
+          </p>
 
           <h3>Early Estimates with Incomplete Information</h3>
           <p>
