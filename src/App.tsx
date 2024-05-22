@@ -87,6 +87,7 @@ function App() {
   const [potSize, setPotSize] = useState(100);
   const [amountToCall, setAmountToCall] = useState(20);
 
+  const [showInfo, setShowInfo] = useState(false);
   const [shouldSimulate, setShouldSimulate] = useState(false);
   const [progress, setProgress] = useState(100);
   const [winProbability, setWinProbability] = useState(0);
@@ -238,6 +239,12 @@ function App() {
               >
                 Shuffle
               </button>
+              <button
+                className={styles.progressButton}
+                onClick={() => setShowInfo(true)}
+              >
+                Info
+              </button>
             </div>
           </div>
         </div>
@@ -254,8 +261,7 @@ function App() {
             setChangeComCard(undefined);
           }}
         />
-      ) : undefined}
-      {changePocCard !== undefined ? (
+      ) : changePocCard !== undefined ? (
         <SelectCardModal
           usedCards={allUsedCards}
           onClose={() => setChangePocCard(undefined)}
@@ -267,6 +273,67 @@ function App() {
             setChangePocCard(undefined);
           }}
         />
+      ) : showInfo ? (
+        <Modal onClose={() => setShowInfo(false)} className={styles.infoModal}>
+          <h2>Info</h2>
+          <p>
+            Welcome to our Poker Hand Strength Simulator! This tool is designed
+            to help you estimate the strength of a poker hand by running
+            simulations.
+          </p>
+
+          <h3>How to Use</h3>
+          <p>To check the strength of your hand:</p>
+          <ol>
+            <li>Select your hole cards (the two cards you hold).</li>
+            <li>Select the community cards (the shared cards on the table).</li>
+            <li>Click "Simulate".</li>
+          </ol>
+
+          <h3>Sharing Your Setup</h3>
+          <p>
+            You can easily share your setup with others by copying the URL of
+            this website. The URL contains all the necessary information for the
+            recipient to view an exact copy of your setup.
+          </p>
+
+          <h3>How the Simulation Works</h3>
+          <p>
+            The simulator evaluates the strength of your poker hand by
+            performing the following steps:
+          </p>
+          <ol>
+            <li>
+              <strong>Setup:</strong> Your hole cards and the community cards
+              are taken as input.
+            </li>
+            <li>
+              <strong>Simulation:</strong> The simulator runs multiple games
+              against a set number of opponents. In each game, the deck is
+              shuffled, but your cards and the community cards remain fixed.
+            </li>
+            <li>
+              <strong>Outcome Calculation:</strong> The number of times your
+              hand wins is recorded. The estimated probability of your hand
+              winning is calculated by dividing the number of wins by the total
+              number of simulations.
+            </li>
+          </ol>
+
+          <h3>Early Estimates with Incomplete Information</h3>
+          <p>
+            If fewer than five community cards are known, the simulator will
+            randomly select the missing community cards to provide an early
+            estimate of your hand's strength. This feature is particularly
+            useful if only the first three community cards are visible, helping
+            you decide whether to stay in the game or fold.
+          </p>
+
+          <p>
+            By using this tool, you can make more informed decisions and improve
+            your overall poker strategy. Happy simulating!
+          </p>
+        </Modal>
       ) : undefined}
     </>
   );
