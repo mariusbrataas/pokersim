@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/pokersim/static/css/main.eb47060a.css",
-    "main.js": "/pokersim/static/js/main.ac6c2ad1.js",
-    "static/js/265.12fd0b2d.chunk.js": "/pokersim/static/js/265.12fd0b2d.chunk.js",
-    "static/js/453.1134508b.chunk.js": "/pokersim/static/js/453.1134508b.chunk.js",
-    "index.html": "/pokersim/index.html",
-    "main.eb47060a.css.map": "/pokersim/static/css/main.eb47060a.css.map",
-    "main.ac6c2ad1.js.map": "/pokersim/static/js/main.ac6c2ad1.js.map",
-    "265.12fd0b2d.chunk.js.map": "/pokersim/static/js/265.12fd0b2d.chunk.js.map",
-    "453.1134508b.chunk.js.map": "/pokersim/static/js/453.1134508b.chunk.js.map"
+    "main.css": "./static/css/main.eb47060a.css",
+    "main.js": "./static/js/main.2025656f.js",
+    "static/js/265.12fd0b2d.chunk.js": "./static/js/265.12fd0b2d.chunk.js",
+    "static/js/453.1134508b.chunk.js": "./static/js/453.1134508b.chunk.js",
+    "index.html": "./index.html",
+    "main.eb47060a.css.map": "./static/css/main.eb47060a.css.map",
+    "main.2025656f.js.map": "./static/js/main.2025656f.js.map",
+    "265.12fd0b2d.chunk.js.map": "./static/js/265.12fd0b2d.chunk.js.map",
+    "453.1134508b.chunk.js.map": "./static/js/453.1134508b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.eb47060a.css",
-    "static/js/main.ac6c2ad1.js"
+    "static/js/main.2025656f.js"
   ]
 }
