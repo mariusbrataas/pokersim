@@ -174,7 +174,8 @@ function App() {
 
           <div className={styles.communityCardWrapper}>
             <h2>
-              Hole cards{best ? ` (${Hand.rankToString(best.rank)})` : ''}
+              Hole cards
+              {best ? ` (Best hand: ${Hand.rankToString(best.rank)})` : ''}
             </h2>
             <div className={styles.communityCards}>
               {pocketCards.map((card, idx) => (
@@ -223,6 +224,21 @@ function App() {
                     opacity: progress === 100 ? 0 : 1
                   }}
                 ></span>
+              </button>
+              <button
+                className={styles.progressButton}
+                onClick={() => {
+                  const deck = new Deck();
+                  const nCom = Math.floor(Math.random() * 3) + 3;
+
+                  setPocketCards(deck.draw(2));
+                  setCommunityCards([
+                    ...deck.draw(nCom),
+                    ...Array.from({ length: 5 - nCom }, () => undefined)
+                  ]);
+                }}
+              >
+                Shuffle
               </button>
             </div>
           </div>

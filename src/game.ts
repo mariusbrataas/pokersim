@@ -163,7 +163,9 @@ export abstract class Hand {
       )
       .reduce((best, current) =>
         current[0] > best[0] ||
-        (current[0] === best[0] && current[1].join() > best[1].join())
+        (current[0] === best[0] &&
+          current[1].map(v => v.toString().padStart(2, '0')).join() >
+            best[1].map(v => v.toString().padStart(2, '0')).join())
           ? current
           : best
       )!;
