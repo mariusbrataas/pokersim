@@ -126,7 +126,10 @@ function App() {
       potSize,
       amountToCall,
       simulationIterations: simulations,
-      progressInterval: 500
+      progressInterval: Math.min(
+        500,
+        Math.max(50, Math.round(simulations / 20))
+      )
     });
   }, [shouldSimulate, progress]);
 
@@ -198,12 +201,16 @@ function App() {
               <NumberInput
                 title="Number of players"
                 value={players}
-                onChange={setPlayers}
+                onChange={v => {
+                  setPlayers(Math.min(14, Math.max(2, Math.round(v))));
+                }}
               />
               <NumberInput
                 title="Simulations"
                 value={simulations}
-                onChange={setSimulations}
+                onChange={v => {
+                  setSimulations(Math.min(100e3, Math.max(100, Math.round(v))));
+                }}
               />
             </div>
             <div className={styles.bigButtons}>
