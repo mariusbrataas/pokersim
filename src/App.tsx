@@ -185,6 +185,7 @@ function App() {
                   key={`pocket_card_${idx}`}
                   card={card || 'back'}
                   onClick={() => setChangePocCard(idx)}
+                  highlight={card && best?.cards[card]}
                 />
               ))}
             </div>
@@ -301,6 +302,10 @@ function App() {
             <li>Select the community cards (the shared cards on the table).</li>
             <li>Click "Simulate".</li>
           </ol>
+          <p>
+            A green dot under a card indicates that the card is part of your
+            best hand.
+          </p>
 
           <h3>Sharing Your Setup</h3>
           <p>
