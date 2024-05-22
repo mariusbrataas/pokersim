@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import styles from './App.module.scss';
 import { Modal } from './Modal';
+import { Tabs } from './Tabs';
 import { Deck, Hand } from './game';
 import { joinStyles } from './joinStyles';
 import { Card, SimulationParams } from './types';
+import { useSearchParam } from './useSearchParam';
 import { createWorker } from './workerUtils';
 
 function RenderCard({
@@ -54,31 +56,45 @@ function NumberInput({
     </div>
   );
 }
+// }
+// function useSearchParam<
+//   T extends
+//     | number
+//     | number[]
+//     | (number | undefined)[]
+//     | string
+//     | string[]
+//     | (string | undefined)[]
+// >(key: string, defaultState: T) {}
 
 function App() {
-  const [communityCards, setCommunityCards] = useState<(undefined | Card)[]>([
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined
-  ]);
-  const [pocketCards, setPocketCards] = useState<(undefined | Card)[]>([
-    undefined,
-    undefined
-  ]);
+  const [communityCards, setCommunityCards] = useSearchParam<
+    (undefined | Card)[]
+  >('community', [undefined, undefined, undefined, undefined, undefined]);
+  const [pocketCards, setPocketCards] = useSearchParam<(undefined | Card)[]>(
+    'hole',
+    [undefined, undefined]
+  );
 
   const [changeComCard, setChangeComCard] = useState<undefined | number>();
   const [changePocCard, setChangePocCard] = useState<undefined | number>();
 
-  const [players, setPlayers] = useState(5);
+  const [simulations, setSimulations] = useSearchParam<number>(
+    'simulations',
+    10e3
+  );
+  const [players, setPlayers] = useSearchParam<number>('players', 5);
   const [potSize, setPotSize] = useState(100);
   const [amountToCall, setAmountToCall] = useState(20);
 
+  const [shouldSimulate, setShouldSimulate] = useState(false);
   const [progress, setProgress] = useState(100);
   const [winProbability, setWinProbability] = useState(0);
 
-  const handleSimulate = () => {
+  useEffect(() => {
+    if (!shouldSimulate || progress !== 100) return;
+    setShouldSimulate(false);
+
     const filteredPocket = pocketCards.filter(card => card) as Card[];
     const filteredCommunity = communityCards.filter(card => card) as Card[];
     if (filteredPocket.length < 2 || filteredCommunity.length < 3) return;
@@ -108,10 +124,10 @@ function App() {
       numPlayers: players,
       potSize,
       amountToCall,
-      simulationIterations: 10e3,
+      simulationIterations: simulations,
       progressInterval: 500
     });
-  };
+  }, [shouldSimulate, progress]);
 
   const allUsedCards = useMemo(
     () => [...pocketCards, ...communityCards].filter(card => card) as Card[],
@@ -135,7 +151,7 @@ function App() {
   }, [pocketCards, communityCards]);
 
   useEffect(() => {
-    handleSimulate();
+    setShouldSimulate(true);
   }, [pocketCards, communityCards, players]);
 
   return (
@@ -158,7 +174,7 @@ function App() {
 
           <div className={styles.communityCardWrapper}>
             <h2>
-              Pocket cards{best ? ` (${Hand.rankToString(best.rank)})` : ''}
+              Hole cards{best ? ` (${Hand.rankToString(best.rank)})` : ''}
             </h2>
             <div className={styles.communityCards}>
               {pocketCards.map((card, idx) => (
@@ -184,12 +200,18 @@ function App() {
                 value={players}
                 onChange={setPlayers}
               />
+              <NumberInput
+                title="Simulations"
+                value={simulations}
+                onChange={setSimulations}
+              />
             </div>
             <div className={styles.bigButtons}>
               <button
                 className={styles.progressButton}
-                onClick={handleSimulate}
+                onClick={() => setShouldSimulate(true)}
                 disabled={
+                  progress !== 100 ||
                   pocketCards.filter(card => card).length < 2 ||
                   communityCards.filter(card => card).length < 3
                 }
@@ -242,7 +264,7 @@ function SelectCardModal({
   onClose
 }: {
   usedCards: Card[];
-  onSelectCard: (card: Card) => void;
+  onSelectCard: (card?: Card) => void;
   onClose: () => void;
 }) {
   const usedCardsMap = useMemo(
@@ -253,19 +275,76 @@ function SelectCardModal({
       }, {} as Record<Card, boolean>),
     [usedCards]
   );
+  const emptyCard = (
+    <RenderCard card="back" onClick={() => onSelectCard(undefined)} />
+  );
   return (
     <Modal onClose={onClose}>
       <h2>Change card</h2>
-      <div className={styles.selectCardModal}>
-        {Deck.getCards().map(card => (
-          <RenderCard
-            key={`select_card_modal_${card}`}
-            card={card}
-            disabled={usedCardsMap[card]}
-            onClick={() => onSelectCard(card)}
-          />
-        ))}
-      </div>
+      <Tabs
+        tabs={{
+          clubs: (
+            <div className={styles.selectCardModal}>
+              {emptyCard}
+              {Deck.getCards().map(card =>
+                Deck.getSuit(card) === 'C' ? (
+                  <RenderCard
+                    key={`select_card_modal_${card}`}
+                    card={card}
+                    disabled={usedCardsMap[card]}
+                    onClick={() => onSelectCard(card)}
+                  />
+                ) : undefined
+              )}
+            </div>
+          ),
+          diamonds: (
+            <div className={styles.selectCardModal}>
+              {emptyCard}
+              {Deck.getCards().map(card =>
+                Deck.getSuit(card) === 'D' ? (
+                  <RenderCard
+                    key={`select_card_modal_${card}`}
+                    card={card}
+                    disabled={usedCardsMap[card]}
+                    onClick={() => onSelectCard(card)}
+                  />
+                ) : undefined
+              )}
+            </div>
+          ),
+          hearts: (
+            <div className={styles.selectCardModal}>
+              {emptyCard}
+              {Deck.getCards().map(card =>
+                Deck.getSuit(card) === 'H' ? (
+                  <RenderCard
+                    key={`select_card_modal_${card}`}
+                    card={card}
+                    disabled={usedCardsMap[card]}
+                    onClick={() => onSelectCard(card)}
+                  />
+                ) : undefined
+              )}
+            </div>
+          ),
+          spades: (
+            <div className={styles.selectCardModal}>
+              {emptyCard}
+              {Deck.getCards().map(card =>
+                Deck.getSuit(card) === 'S' ? (
+                  <RenderCard
+                    key={`select_card_modal_${card}`}
+                    card={card}
+                    disabled={usedCardsMap[card]}
+                    onClick={() => onSelectCard(card)}
+                  />
+                ) : undefined
+              )}
+            </div>
+          )
+        }}
+      />
     </Modal>
   );
 }

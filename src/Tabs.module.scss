@@ -1,0 +1,64 @@
+.tabs {
+  .tabsBar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+
+    label {
+      padding: 8px 16px;
+    }
+
+    .tabsContainer {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: start;
+      background-color: #f6f6f6;
+      border-radius: 8px;
+      width: fit-content;
+      max-width: 100%;
+
+      user-select: none;
+
+      overflow-y: hidden;
+      white-space: nowrap;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      overflow-x: -moz-scrollbars-none;
+      scrollbar-width: 0px;
+      -ms-overflow-style: none;
+      &::-webkit-scrollbar {
+        display: none;
+        width: 0px !important;
+      }
+
+      button.tab {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        scroll-snap-align: start;
+
+        outline: none;
+        border: none;
+        background: none;
+
+        font-size: 16px;
+
+        text-transform: capitalize;
+        color: #000;
+
+        &:hover {
+          background-color: lightgray;
+        }
+
+        &.selectedTab {
+          background-color: #e6eef9;
+          color: #185ee0;
+        }
+      }
+    }
+  }
+}
