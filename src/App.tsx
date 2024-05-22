@@ -338,11 +338,6 @@ function App() {
             useful if only the first three community cards are visible, helping
             you decide whether to stay in the game or fold.
           </p>
-
-          <p>
-            By using this tool, you can make more informed decisions and improve
-            your overall poker strategy. Happy simulating!
-          </p>
         </Modal>
       ) : undefined}
     </>

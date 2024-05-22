@@ -54,7 +54,7 @@ export function useSearchParam<
     searchParams.set(key, encodeValue(nextState));
 
     const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-    window.history.pushState(null, '', newUrl);
+    window.history.replaceState(null, '', newUrl);
 
     setState(nextState);
   };
