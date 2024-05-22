@@ -173,10 +173,8 @@ function App() {
           </div>
 
           <div className={styles.communityCardWrapper}>
-            <h2>
-              Hole cards
-              {best ? ` (Best hand: ${Hand.rankToString(best.rank)})` : ''}
-            </h2>
+            <h2>Hole cards</h2>
+            <h4>Best hand: {best ? Hand.rankToString(best.rank) : 'None'}</h4>
             <div className={styles.communityCards}>
               {pocketCards.map((card, idx) => (
                 <RenderCard
