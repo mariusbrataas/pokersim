@@ -22,6 +22,8 @@ module.exports = {
   rules: {
     'no-restricted-globals': ['error', 'isFinite', 'isNaN'], // Allow 'self'
     'react/react-in-jsx-scope': 'off',
-    'react/jsx-uses-react': 'off'
+    'react/jsx-uses-react': 'off',
+    'react/display-name': 'off',
+    '@typescript-eslint/no-empty-function': 'off'
   }
 };

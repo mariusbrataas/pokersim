@@ -1,46 +1,36 @@
 import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import styles from './App.module.scss';
-import { Game } from './game';
+import { Modal } from './Modal';
+import { Deck, Hand } from './game';
+import { joinStyles } from './joinStyles';
 import { Card, SimulationParams } from './types';
 import { createWorker } from './workerUtils';
 
-function RenderCard({ card }: { card: Card | 'back' }) {
+function RenderCard({
+  card,
+  onClick,
+  disabled,
+  highlight
+}: {
+  card: Card | 'back';
+  onClick?: () => void;
+  disabled?: boolean;
+  highlight?: boolean;
+}) {
   return (
-    <div className={styles.card}>
-      <img src={`images/${card}.svg`} />
-    </div>
-  );
-}
-
-function CommunityCards({ cards }: { cards: Card[] }) {
-  return (
-    <div className={styles.communityCardWrapper}>
-      <h2>Community cards</h2>
-      <div className={styles.communityCards}>
-        {cards.map(card => (
-          <RenderCard key={`community_card_${card}`} card={card} />
-        ))}
-        {Array.from({ length: 5 - cards.length }, (_, idx) => (
-          <div
-            key={`community_card_hidden_${idx}`}
-            className={styles.hiddenCommunityCard}
-          >
-            <RenderCard card="back" />
-          </div>
-        ))}
+    <>
+      <div
+        className={joinStyles(
+          styles.card,
+          disabled && styles.disabled,
+          highlight && styles.highlight
+        )}
+        onClick={onClick}
+      >
+        <img src={`images/${card}.svg`} />
       </div>
-    </div>
-  );
-}
-
-function PocketCards({ cards }: { cards: Card[] }) {
-  return (
-    <div className={styles.pocketCards}>
-      {cards.map(card => (
-        <RenderCard key={`pocket_card_${card}`} card={card} />
-      ))}
-    </div>
+    </>
   );
 }
 
@@ -66,32 +56,33 @@ function NumberInput({
 }
 
 function App() {
-  const game = useMemo(() => {
-    const newGame = new Game(['AC', 'KC'], 5, { milliseconds: 1e3 });
-    newGame.drawCommunityCards(3);
-    newGame.setPotSize(100);
-    newGame.setAmountToCall(20);
-    return newGame;
-  }, []);
+  const [communityCards, setCommunityCards] = useState<(undefined | Card)[]>([
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined
+  ]);
+  const [pocketCards, setPocketCards] = useState<(undefined | Card)[]>([
+    undefined,
+    undefined
+  ]);
 
-  const [players, setPlayers] = useState(game.numPlayers);
-  const [potSize, setPotSize] = useState(game.potSize);
-  const [amountToCall, setAmountToCall] = useState(game.amountToCall);
+  const [changeComCard, setChangeComCard] = useState<undefined | number>();
+  const [changePocCard, setChangePocCard] = useState<undefined | number>();
 
-  useEffect(() => {
-    game.setNumPlayers(players);
-  }, [players]);
-  useEffect(() => {
-    game.setPotSize(potSize);
-  }, [potSize]);
-  useEffect(() => {
-    game.setAmountToCall(amountToCall);
-  }, [amountToCall]);
+  const [players, setPlayers] = useState(5);
+  const [potSize, setPotSize] = useState(100);
+  const [amountToCall, setAmountToCall] = useState(20);
 
   const [progress, setProgress] = useState(100);
   const [winProbability, setWinProbability] = useState(0);
 
   const handleSimulate = () => {
+    const filteredPocket = pocketCards.filter(card => card) as Card[];
+    const filteredCommunity = communityCards.filter(card => card) as Card[];
+    if (filteredPocket.length < 2 || filteredCommunity.length < 3) return;
+
     const worker = createWorker<
       {
         simulation: SimulationParams;
@@ -110,61 +101,182 @@ function App() {
       () => setProgress(100)
     );
 
+    setProgress(0);
     worker.post('simulation', {
-      myHand: ['AH', 'KH'],
-      numPlayers: 3,
-      communityCards: ['2C', '3D', '4H'],
-      potSize: 100,
-      amountToCall: 10,
-      simulationIterations: 30e3,
-      progressInterval: 1000
+      myHand: filteredPocket,
+      communityCards: filteredCommunity,
+      numPlayers: players,
+      potSize,
+      amountToCall,
+      simulationIterations: 10e3,
+      progressInterval: 500
     });
   };
 
+  const allUsedCards = useMemo(
+    () => [...pocketCards, ...communityCards].filter(card => card) as Card[],
+    [pocketCards, communityCards]
+  );
+
+  const best = useMemo(() => {
+    const filteredPocket = pocketCards.filter(card => card) as Card[];
+    const filteredCommunity = communityCards.filter(card => card) as Card[];
+    if (filteredPocket.length < 2 || filteredCommunity.length < 3) return;
+
+    const bestHand = Hand.best([...filteredPocket, ...filteredCommunity]);
+    const bestHandCards = bestHand[2];
+
+    const bestHandCardLib = bestHandCards.reduce((acc, card) => {
+      acc[card] = true;
+      return acc;
+    }, {} as Record<Card, boolean>);
+
+    return { rank: bestHand[0], cards: bestHandCardLib };
+  }, [pocketCards, communityCards]);
+
+  useEffect(() => {
+    handleSimulate();
+  }, [pocketCards, communityCards, players]);
+
   return (
-    <main className={styles.app}>
-      <div className={styles.content}>
-        <CommunityCards cards={game.communityCards} />
-        <PocketCards cards={game.myHand} />
+    <>
+      <main className={styles.app}>
+        <div className={styles.content}>
+          <div className={styles.communityCardWrapper}>
+            <h2>Community cards</h2>
+            <div className={styles.communityCards}>
+              {communityCards.map((card, idx) => (
+                <RenderCard
+                  key={`community_card_${idx}`}
+                  card={card || 'back'}
+                  onClick={() => setChangeComCard(idx)}
+                  highlight={card && best?.cards[card]}
+                />
+              ))}
+            </div>
+          </div>
 
-        <div>
+          <div className={styles.communityCardWrapper}>
+            <h2>
+              Pocket cards{best ? ` (${Hand.rankToString(best.rank)})` : ''}
+            </h2>
+            <div className={styles.communityCards}>
+              {pocketCards.map((card, idx) => (
+                <RenderCard
+                  key={`pocket_card_${idx}`}
+                  card={card || 'back'}
+                  onClick={() => setChangePocCard(idx)}
+                />
+              ))}
+            </div>
+          </div>
+
           <div>
-            Win probability: {Math.round(winProbability * 10000) / 100}%
+            <div>
+              Win probability: {Math.round(winProbability * 10000) / 100}%
+            </div>
           </div>
-        </div>
 
-        <div className={styles.settingsCard}>
-          <div className={styles.inputs}>
-            <NumberInput
-              title="Number of players"
-              value={players}
-              onChange={setPlayers}
-            />
-            <NumberInput
-              title="Pot size"
-              value={potSize}
-              onChange={setPotSize}
-            />
-            <NumberInput
-              title="Amount to call"
-              value={amountToCall}
-              onChange={setAmountToCall}
-            />
-          </div>
-          <div className={styles.bigButtons}>
-            <button className={styles.progressButton} onClick={handleSimulate}>
-              Simulate!
-              <span
-                style={{
-                  width: `${progress === 100 ? 0 : progress}%`,
-                  opacity: progress === 100 ? 0 : 1
-                }}
-              ></span>
-            </button>
+          <div className={styles.settingsCard}>
+            <div className={styles.inputs}>
+              <NumberInput
+                title="Number of players"
+                value={players}
+                onChange={setPlayers}
+              />
+              <NumberInput
+                title="Pot size"
+                value={potSize}
+                onChange={setPotSize}
+              />
+              <NumberInput
+                title="Amount to call"
+                value={amountToCall}
+                onChange={setAmountToCall}
+              />
+            </div>
+            <div className={styles.bigButtons}>
+              <button
+                className={styles.progressButton}
+                onClick={handleSimulate}
+                disabled={
+                  pocketCards.filter(card => card).length < 2 ||
+                  communityCards.filter(card => card).length < 3
+                }
+              >
+                Simulate!
+                <span
+                  style={{
+                    width: `${progress === 100 ? 0 : progress}%`,
+                    opacity: progress === 100 ? 0 : 1
+                  }}
+                ></span>
+              </button>
+            </div>
           </div>
         </div>
+      </main>
+      {changeComCard !== undefined ? (
+        <SelectCardModal
+          usedCards={allUsedCards}
+          onClose={() => setChangeComCard(undefined)}
+          onSelectCard={nextCard => {
+            setCommunityCards(prevState => {
+              prevState[changeComCard] = nextCard;
+              return [...prevState];
+            });
+            setChangeComCard(undefined);
+          }}
+        />
+      ) : undefined}
+      {changePocCard !== undefined ? (
+        <SelectCardModal
+          usedCards={allUsedCards}
+          onClose={() => setChangePocCard(undefined)}
+          onSelectCard={nextCard => {
+            setPocketCards(prevState => {
+              prevState[changePocCard] = nextCard;
+              return [...prevState];
+            });
+            setChangePocCard(undefined);
+          }}
+        />
+      ) : undefined}
+    </>
+  );
+}
+
+function SelectCardModal({
+  usedCards,
+  onSelectCard,
+  onClose
+}: {
+  usedCards: Card[];
+  onSelectCard: (card: Card) => void;
+  onClose: () => void;
+}) {
+  const usedCardsMap = useMemo(
+    () =>
+      usedCards.reduce((acc, card) => {
+        acc[card] = true;
+        return acc;
+      }, {} as Record<Card, boolean>),
+    [usedCards]
+  );
+  return (
+    <Modal onClose={onClose}>
+      <h2>Change card</h2>
+      <div className={styles.selectCardModal}>
+        {Deck.getCards().map(card => (
+          <RenderCard
+            key={`select_card_modal_${card}`}
+            card={card}
+            disabled={usedCardsMap[card]}
+            onClick={() => onSelectCard(card)}
+          />
+        ))}
       </div>
-    </main>
+    </Modal>
   );
 }
 

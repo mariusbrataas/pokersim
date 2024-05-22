@@ -1,7 +1,7 @@
 import { Card, HandRank, Rank, Suit } from './types';
 import { getCombinations, shuffle } from './utils';
 
-class Deck {
+export class Deck {
   static suits: Suit[] = ['C', 'D', 'H', 'S'];
   static ranks: Rank[] = [
     '2',
@@ -66,7 +66,32 @@ class Deck {
   };
 }
 
-abstract class Hand {
+export abstract class Hand {
+  static rankToString = (rank: HandRank) => {
+    switch (rank) {
+      case HandRank.royalFlush:
+        return 'Royal Flush';
+      case HandRank.straightFlush:
+        return 'Straight Flush';
+      case HandRank.fourOfAKind:
+        return 'Four of a Kind';
+      case HandRank.fullHouse:
+        return 'Full House';
+      case HandRank.flush:
+        return 'Flush';
+      case HandRank.straight:
+        return 'Straight';
+      case HandRank.threeOfAKind:
+        return 'Three of a Kind';
+      case HandRank.twoPair:
+        return 'Two pair';
+      case HandRank.onePair:
+        return 'One pair';
+      default:
+        return 'High card';
+    }
+  };
+
   static rank = (hand: Card[]): [HandRank, number[]] => {
     if (hand.some(test => test === undefined))
       throw new Error('Missing cards in hand');
@@ -133,18 +158,20 @@ abstract class Hand {
   static best = (cards: Card[]) => {
     const combinations = getCombinations(cards, 5);
     return combinations
-      .map(combo => this.rank(combo))
+      .map(
+        combo => [...this.rank(combo), combo] as [HandRank, number[], Card[]]
+      )
       .reduce((best, current) =>
         current[0] > best[0] ||
         (current[0] === best[0] && current[1].join() > best[1].join())
           ? current
           : best
-      );
+      )!;
   };
 
   static compare = (
-    hand1: [HandRank, number[]],
-    hand2: [HandRank, number[]]
+    hand1: [HandRank, number[], Card[]],
+    hand2: [HandRank, number[], Card[]]
   ) => {
     const handOneRank = hand1[0];
     const handTwoRank = hand2[0];
